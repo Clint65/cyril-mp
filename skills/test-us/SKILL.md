@@ -1,6 +1,6 @@
 ---
 name: test-us
-description: Create and run tests for a completed user story, fixing code if tests fail
+description: Create and run tests for a completed user story, fixing code if tests fail. Use when the user wants to test a story, verify acceptance criteria, generate test coverage for a story, or validate implementation. Triggers on "test story", "verify story", "add tests for story", or after story completion.
 argument-hint: <story-path>
 context: fork
 allowed-tools:
@@ -10,7 +10,7 @@ allowed-tools:
   - Bash
   - Glob
   - Grep
-  - Task
+  - Agent
 ---
 
 Create and run tests for the user story at $ARGUMENTS.

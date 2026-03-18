@@ -1,6 +1,6 @@
 ---
 name: qa-report
-description: Execute all tests and generate a QA report for user stories coverage and results
+description: Execute all tests and generate a QA report for user stories coverage and results. Use when the user wants a quality assessment, test coverage overview, story completion status, or to identify testing gaps across stories. Triggers on "QA report", "test coverage", "quality check", "story status overview", or when auditing project health.
 argument-hint: [scope: epic (E01), feature (F01), or "all"]
 context: fork
 allowed-tools:
@@ -10,7 +10,7 @@ allowed-tools:
   - Bash
   - Glob
   - Grep
-  - Task
+  - Agent
 ---
 
 Generate a comprehensive QA report for $ARGUMENTS user stories. If no argument provided, default scope is "all".

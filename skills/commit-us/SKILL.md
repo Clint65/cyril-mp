@@ -1,8 +1,7 @@
 ---
 name: commit-us
-description: Commit a completed user story with proper git message format
+description: Commit a completed user story with proper Angular Conventional Commits git message format. Use when the user wants to commit a story, save story progress to git, or create a structured commit for a user story. Triggers on "commit story", "save story", or after testing a story.
 argument-hint: <story-path>
-context: fork
 disable-model-invocation: true
 allowed-tools:
   - Read

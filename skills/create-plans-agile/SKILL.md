@@ -1,6 +1,6 @@
 ---
-name: create-plan-agile
-description: Create Agile project plans with Epic/Feature/User Story structure optimized for solo agentic development. Use when planning projects using Scrum-like methodology. Produces Claude-executable user story plans with acceptance criteria, story points, and verification. Handles briefs, roadmaps, epics, features, user stories, and context handoffs.
+name: create-plans-agile
+description: Create Agile project plans with Epic/Feature/User Story structure optimized for solo agentic development. Use when planning projects, organizing a backlog, creating user stories, defining epics or features, or using Scrum-like methodology. Triggers on requests to plan a project, structure work into stories, estimate effort with story points, create a roadmap, or manage context handoffs. Also use when the user mentions "agile", "backlog", "sprint", "user story", "epic", "feature", or wants to break down a project into deliverable increments.
 argument-hint: [what to plan]
 ---
 
@@ -175,18 +175,19 @@ If yes: `git init`
 </context_scan>
 
 <domain_expertise>
-**Domain expertise lives in `~/.claude/skills/expertise/`**
+**Domain expertise** can optionally live in `~/.claude/skills/expertise/` if the user has configured domain-specific skills.
 
-Before creating roadmap or user stories, determine if domain expertise should be loaded.
+Before creating roadmap or user stories, check if domain expertise is available.
 
 <scan_domains>
 ```bash
-ls ~/.claude/skills/expertise/ 2>/dev/null
+ls ~/.claude/skills/expertise/ 2>/dev/null || echo "NO_DOMAIN_EXPERTISE"
 ```
+If `NO_DOMAIN_EXPERTISE`: Skip domain loading entirely and continue with planning.
 </scan_domains>
 
 <inference_rules>
-If user's request contains domain keywords, INFER the domain:
+If domain expertise directory exists and user's request contains domain keywords, INFER the domain:
 
 | Keywords | Domain Skill |
 |----------|--------------|

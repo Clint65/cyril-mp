@@ -1,6 +1,6 @@
 ---
 name: run-us
-description: Execute a US-PLAN.md file (user story implementation plan)
+description: Execute a US-PLAN.md file (user story implementation plan). Use when the user wants to implement, build, execute, or run a planned user story. Triggers on "run story", "execute plan", "implement story", "build story", or when a US-PLAN.md exists and the user wants to start coding.
 argument-hint: <plan-path>
 allowed-tools:
   - Read
@@ -9,7 +9,7 @@ allowed-tools:
   - Bash
   - Glob
   - Grep
-  - Task
+  - Agent
   - mcp__context7__*
   - mcp__exa__*
 ---
@@ -57,7 +57,7 @@ grep "type=\"checkpoint" $ARGUMENTS
 **A. Fully Autonomous (no checkpoints):**
 - All tasks are `type="auto"`
 - Can execute in subagent with fresh context
-- Spawn Task agent to execute entire plan
+- Spawn Agent to execute entire plan
 - Agent creates SUMMARY, reports back
 
 **B. Segmented Execution (verify-only checkpoints):**
@@ -79,7 +79,7 @@ This plan has no checkpoints - executing autonomously.
 
 Spawning subagent to implement: [story title]
 ```
-- Use Task tool to spawn execution
+- Use Agent tool to spawn execution
 - Subagent runs entire plan
 - Creates US-SUMMARY.md
 - Reports completion

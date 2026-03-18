@@ -24,10 +24,8 @@ Output: [What will be built - files, components, functionality]
 </objective>
 
 <execution_context>
-@~/.claude/skills/create-plans-agile/workflows/execute-user-story.md
-@~/.claude/skills/create-plans-agile/templates/us-summary.md
-[If checkpoints present:]
-@~/.claude/skills/create-plans-agile/references/checkpoints.md
+Execute this plan with: /run-us [path-to-this-plan]
+The run-us skill handles execution protocol, deviation rules, and summary creation.
 </execution_context>
 
 <context>

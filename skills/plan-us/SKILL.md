@@ -1,6 +1,6 @@
 ---
 name: plan-us
-description: Create an execution plan (US-PLAN.md) for a specific user story
+description: Create an execution plan (US-PLAN.md) for a specific user story. Use when the user wants to plan a story, create a task breakdown for a user story, or prepare a story for implementation. Triggers on "plan story", "prepare story", "break down story", or when a user story exists but has no US-PLAN.md yet.
 argument-hint: <story-path>
 context: fork
 allowed-tools:
@@ -121,8 +121,8 @@ Output: [what will be built]
 </objective>
 
 <execution_context>
-@~/.claude/skills/create-plans-agile/workflows/execute-user-story.md
-@~/.claude/skills/create-plans-agile/templates/us-summary.md
+Execute this plan with: /run-us [path-to-this-plan]
+The run-us skill handles execution protocol, deviation rules, and summary creation.
 </execution_context>
 
 <context>
