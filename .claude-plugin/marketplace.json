@@ -4,13 +4,13 @@
     "name": "Cyril Brandy"
   },
   "metadata": {
-    "description": "Agile planning skills for Claude Code - Epic/Feature/User Story methodology",
-    "version": "1.1.0"
+    "description": "Claude Code skills: Agile planning & Databox NL→SQL",
+    "version": "1.2.0"
   },
   "plugins": [
     {
       "name": "agile-planning",
-      "source": "./",
+      "source": "./agile",
       "description": "Agile project planning with Epic/Feature/User Story structure. Includes skills for planning, executing, testing, committing user stories, and generating QA reports.",
       "version": "1.1.0",
       "author": {
@@ -23,6 +23,23 @@
         "user-stories",
         "epics",
         "project-management"
+      ]
+    },
+    {
+      "name": "databox-query",
+      "source": "./databox",
+      "description": "Interrogation NL→SQL de la base PostgreSQL Databox (ERP/CRM) en langage naturel français.",
+      "version": "1.0.0",
+      "author": {
+        "name": "Cyril Brandy"
+      },
+      "keywords": [
+        "databox",
+        "sql",
+        "erp",
+        "crm",
+        "natural-language",
+        "postgresql"
       ]
     }
   ]
