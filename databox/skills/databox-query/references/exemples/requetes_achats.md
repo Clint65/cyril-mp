@@ -84,7 +84,7 @@ SELECT
   COUNT(*) AS nb
 FROM databox.manufacturing_orders mo
 INNER JOIN databox.id_mapping im ON mo.manufacturing_orders_id_databox = im.id_databox
-LEFT JOIN databox.value_list_column_config vlcc ON vlcc.column_name = 'manufacturingOrdersStatus'
+LEFT JOIN databox.value_list_column_config vlcc ON vlcc.column_name = 'manufacturing_orders_status'
 LEFT JOIN databox.value_list_entry vle
   ON vle.value_list_id = vlcc.value_list_id
   AND vle.neutral_code = mo.manufacturing_orders_status::text
@@ -121,7 +121,7 @@ SELECT
   vll.label AS statut
 FROM databox.manufacturing_orders mo
 INNER JOIN databox.id_mapping im ON mo.manufacturing_orders_id_databox = im.id_databox
-LEFT JOIN databox.value_list_column_config vlcc ON vlcc.column_name = 'manufacturingOrdersStatus'
+LEFT JOIN databox.value_list_column_config vlcc ON vlcc.column_name = 'manufacturing_orders_status'
 LEFT JOIN databox.value_list_entry vle
   ON vle.value_list_id = vlcc.value_list_id
   AND vle.neutral_code = mo.manufacturing_orders_status::text

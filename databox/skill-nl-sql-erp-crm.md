@@ -97,7 +97,7 @@ Les colonnes contenant des codes (statuts, types, catégories…) se décodent v
 - `value_list` — catalogue des listes (ex : `account_type`, `quotes_status`)
 - `value_list_entry` — entrées avec un `neutral_code` agnostique du système source
 - `value_list_label` — libellés multilingues par entrée (`locale` = `fr`, `en`…)
-- `value_list_system_mapping` — correspondance entre `neutral_code` et code système source (x3, salesforce…)
+- `value_list_system_mapping` — correspondance entre `neutral_code` et code système source (X3, WC, Salesforce — en majuscules)
 - `value_list_column_config` — table pivot : quelle colonne BDD utilise quelle liste
 
 **Pattern de jointure pour obtenir le libellé d'une colonne codée :**
@@ -105,7 +105,7 @@ Les colonnes contenant des codes (statuts, types, catégories…) se décodent v
 ```sql
 -- Exemple : décoder accounts_account_type en français
 LEFT JOIN databox.value_list_column_config vlcc
-    ON vlcc.column_name = 'accountsAccountType'
+    ON vlcc.column_name = 'accounts_account_type'
 LEFT JOIN databox.value_list_entry vle
     ON vle.value_list_id = vlcc.value_list_id
     AND vle.neutral_code = a.accounts_account_type

@@ -82,21 +82,21 @@ ORDER BY vlcc.column_name;
 
 **Points clés :**
 - 58 colonnes décodables dans le schéma
-- `column_name` en **camelCase** (ex : `salesOrdersOrderStatus`, pas `sales_orders_order_status`)
+- `column_name` en **snake_case** (nom BDD, ex : `sales_orders_order_status`)
 - `is_array = true` pour les colonnes contenant un tableau de codes (ex : `salesOrdersLinesFamilyCode`)
 
 **Colonnes les plus utiles :**
 
 | column_name | value_list | Usage |
 |-------------|-----------|-------|
-| `quotesQuoteStatus` | local_menus_430 | Statut devis |
-| `salesOrdersOrderStatus` | local_menus_415 | Statut commande |
-| `salesOrdersDeliveryStatus` | local_menus_417 | Statut livraison |
-| `salesOrdersInvoiceStatus` | local_menus_418 | Statut facturation |
-| `manufacturingOrdersStatus` | local_menus_363 | Statut OF |
-| `accountsAccountType` | account_type | Type de compte |
-| `accountsCategory` | customer_category | Catégorie client |
-| `accountsPaymentTerm` | payment_term | Conditions paiement |
+| `quotes_quote_status` | local_menus_430 | Statut devis |
+| `sales_orders_order_status` | local_menus_415 | Statut commande |
+| `sales_orders_delivery_status` | local_menus_417 | Statut livraison |
+| `sales_orders_invoice_status` | local_menus_418 | Statut facturation |
+| `manufacturing_orders_status` | local_menus_363 | Statut OF |
+| `accounts_account_type` | account_type | Type de compte |
+| `accounts_category` | customer_category | Catégorie client |
+| `accounts_payment_term` | payment_term | Conditions paiement |
 
 ---
 

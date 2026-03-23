@@ -83,7 +83,7 @@ Correspondance entre code neutre et code systeme source.
 |---------|------|-------------|
 | id | serial PK | Identifiant |
 | entry_id | integer FK | Reference vers value_list_entry |
-| system_type | text | Systeme source (x3, salesforce, plm) |
+| system_type | text | Systeme source (X3, WC, Salesforce) — en majuscules |
 | system_code | text | Code dans ce systeme |
 
 Contrainte : `UNIQUE(entry_id, system_type)`
@@ -94,7 +94,7 @@ Configuration : quelle colonne de la base utilise quelle liste.
 | Colonne | Type | Description |
 |---------|------|-------------|
 | id | serial PK | Identifiant |
-| column_name | text UNIQUE | Nom de la colonne (ex: accountsAccountType) |
+| column_name | text UNIQUE | Nom de la colonne en BDD, snake_case (ex: accounts_account_type) |
 | value_list_id | integer FK | Reference vers value_list |
 | is_array | boolean | true si la colonne contient un tableau de codes |
 
@@ -131,18 +131,23 @@ Module `@Global()` importe dans `AppModule`. Enregistre les parsers via `useFact
 
 ## Integration avec AbstractService
 
-`AbstractService.getColumnConfig()` utilise `ValueListService` :
+`AbstractService.getColumnConfig()` utilise `ValueListService` avec le nom de colonne BDD (snake_case) :
 
 ```typescript
+// Convertir le nom TypeScript (camelCase) en nom BDD (snake_case)
+const dbColumnName = this.table[col].name;
+
 // Verifie si la colonne a un lookup (synchrone, cache)
-if (!this.valueListService.hasConfig(col)) {
+if (!this.valueListService.hasConfig(dbColumnName)) {
     return baseConfig;
 }
 // Charge les formatterParams depuis la base (async)
-const formatterParams = await this.valueListService.getFormatterParams(col, currentLang);
+const formatterParams = await this.valueListService.getFormatterParams(dbColumnName, currentLang);
 ```
 
 Les methodes `getColumnConfig()` et `getColumns()` sont `async`.
+
+**Note :** les donnees en base contiennent deja les codes neutres (le logiciel amont remplace les codes systeme avant insertion). Les `formatterParams` utilisent donc directement ces codes neutres comme cles.
 
 ## Fichiers de configuration
 
@@ -151,7 +156,7 @@ Les methodes `getColumnConfig()` et `getColumns()` sont `async`.
 Conserve pour le parser X3 et le script seed. Deux sections :
 
 - **fileKey** : pour chaque type de fichier CSV, quelles colonnes forment la cle
-- **columns** : pour chaque colonne de la base, quel fichier CSV et quelle colonne contient le label
+- **columns** : pour chaque colonne de la base (cle en snake_case, nom BDD), quel fichier CSV et quelle colonne contient le label
 
 Seuls les fichiers references dans `columns` sont charges par le parser. Les fichiers presents dans `fileKey` mais pas dans `columns` sont ignores (pas encore utilises).
 

@@ -199,7 +199,7 @@ SELECT q.quotes_quote_status AS code, vll.label AS statut, COUNT(*) AS nb
 FROM databox.quotes q
 INNER JOIN databox.id_mapping im ON q.quotes_id_databox = im.id_databox
 LEFT JOIN databox.value_list_column_config vlcc
-  ON vlcc.column_name = 'quotesQuoteStatus'
+  ON vlcc.column_name = 'quotes_quote_status'
 LEFT JOIN databox.value_list_entry vle
   ON vle.value_list_id = vlcc.value_list_id
   AND vle.neutral_code = q.quotes_quote_status
@@ -221,9 +221,9 @@ Ceci **diffère** de DB-SCHEMA.md qui documente `'2'` = commandé et `'3'` = par
 
 **Pattern de décodage générique :**
 ```sql
-LEFT JOIN databox.value_list_column_config vlcc ON vlcc.column_name = '{camelCaseColumnName}'
+LEFT JOIN databox.value_list_column_config vlcc ON vlcc.column_name = '{snake_case_column_name}'
 LEFT JOIN databox.value_list_entry vle ON vle.value_list_id = vlcc.value_list_id AND vle.neutral_code = {table}.{column}
 LEFT JOIN databox.value_list_label vll ON vll.entry_id = vle.id AND vll.locale = 'fr'
 ```
 
-Le `column_name` dans `value_list_column_config` est en **camelCase** (ex : `quotesQuoteStatus`, pas `quotes_quote_status`).
+Le `column_name` dans `value_list_column_config` est en **snake_case** (nom BDD, ex : `quotes_quote_status`).

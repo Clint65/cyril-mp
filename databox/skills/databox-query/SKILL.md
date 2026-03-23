@@ -147,10 +147,10 @@ Même logique pour `open_items_sign` sur la table `open_items`.
 #### Règle 6 : Décodage des colonnes codées (value_lists)
 
 Les colonnes affichant des statuts/types à l'utilisateur doivent être décodées via le
-système de value_lists. Le `column_name` dans `value_list_column_config` est en **camelCase**.
+système de value_lists. Le `column_name` dans `value_list_column_config` est en **snake_case** (nom BDD).
 
 ```sql
-LEFT JOIN databox.value_list_column_config vlcc ON vlcc.column_name = 'quotesQuoteStatus'
+LEFT JOIN databox.value_list_column_config vlcc ON vlcc.column_name = 'quotes_quote_status'
 LEFT JOIN databox.value_list_entry vle
     ON vle.value_list_id = vlcc.value_list_id AND vle.neutral_code = q.quotes_quote_status
 LEFT JOIN databox.value_list_label vll ON vll.entry_id = vle.id AND vll.locale = 'fr'
