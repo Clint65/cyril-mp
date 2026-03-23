@@ -18,7 +18,27 @@ Créer tous les éléments ThingWorx nécessaires pour une nouvelle entité Data
    ```
 3. Lister tous les endpoints disponibles (standards + custom)
 
-### Étape 2 : Lire un ThingShape de référence
+### Étape 2 : Lire le controller NestJS et noter les noms EXACTS
+
+**Critique** : les noms de sous-routes ne suivent aucun pattern régulier dans l'API. Il faut copier les noms exacts depuis les décorateurs `@Get()` du controller. Exemples de pièges :
+
+| Entité | Sous-route lignes | Attention |
+|--------|------------------|-----------|
+| purchaseOrders | `purchaseOrdersLines` | Avec le **s** de Orders |
+| salesOrders | `salesOrderLines` | **Sans** le s de Orders |
+| invoices | `invoiceLines` | **Singulier** |
+| quotes | `quoteLines` | **Singulier** |
+| deliveries | `deliveryLines` | **Singulier** |
+| serviceContracts | `serviceContractLines` | **Singulier** |
+
+```bash
+# Lire le controller pour obtenir les noms exacts
+cat /Users/cyril/Documents/01_Sources/01_Databox/databox-data-access/src/data-databox/[module]/*.controller.ts
+```
+
+Copier les noms tels quels dans les chemins API des services ThingWorx.
+
+### Étape 3 : Lire un ThingShape de référence
 
 Avant de générer, lire un ThingShape existant similaire pour comprendre les patterns exacts :
 
@@ -29,7 +49,7 @@ cat /Users/cyril/Documents/01_Sources/01_Databox/databox-twx-dashboard/08-Source
 
 Consulter aussi `references/service-patterns.md` pour les patterns documentés.
 
-### Étape 3 : Générer le ThingShape
+### Étape 4 : Générer le ThingShape
 
 Créer le fichier `08-SourceControl/DataBox/ThingShapes/DataBox_TS_[EntityName].xml` avec :
 
@@ -47,7 +67,7 @@ Créer le fichier `08-SourceControl/DataBox/ThingShapes/DataBox_TS_[EntityName].
 
 3. **Permissions** - Appliquer les permissions standard
 
-### Étape 4 : Générer le Dashboard (optionnel)
+### Étape 5 : Générer le Dashboard (optionnel)
 
 Lire un dashboard existant comme référence :
 ```bash
@@ -56,14 +76,44 @@ cat /Users/cyril/Documents/01_Sources/01_Databox/databox-twx-dashboard/08-Source
 
 Créer `08-SourceControl/DataBox/Mashups/DataBox_Dashboard_[EntityName].xml`
 
-### Étape 5 : Générer les Tiles (optionnel)
+### Étape 6 : Mettre à jour GetTableLinks
+
+**Critique** : Pour que la navigation fonctionne dans les grilles FCADDataGrid (clic sur une ligne → ouverture du Dashboard Details), il faut ajouter une entrée dans le service `GetTableLinks` de `DataBox_Helper_Platform`.
+
+Fichier : `08-SourceControl/DataBox/Things/DataBox_Helper_Platform.xml`
+Service : `GetTableLinks` (vers ligne 935)
+
+Ce service retourne un objet JSON qui mappe les noms de tables API vers les mashups Dashboard Details :
+
+```javascript
+result = {
+    // Entrées existantes...
+    accounts: "DataBox_Dashboard_AccountsDetails&code=",
+    quotes: "DataBox_Dashboard_QuotesDetails&code=",
+    // ...
+
+    // AJOUTER pour la nouvelle entité :
+    [table_api_name]: "DataBox_Dashboard_[EntityName]Details&code=",
+    // Si l'entité a des lignes :
+    [table_api_name]_lines: "DataBox_Dashboard_[EntityName]LinesDetails&code=",
+};
+```
+
+**Convention du mapping :**
+- Clé = nom de la table dans l'API REST (snake_case, ex: `purchase_orders`, `sales_orders_lines`)
+- Valeur = `"[NomMashupDetails]&[paramètre]="` où paramètre est `code=` (par défaut) ou `idcor=` (pour correspondance)
+- Pour les variantes avec idCorrespondence, ajouter une clé `_cor` : `purchase_orders_cor: "...&idcor="`
+
+**Où c'est utilisé :** Les services `GetGridConfig` et `GetGridConfigPagination` appellent `me.GetTableLinks()` et fusionnent le résultat dans la config du FCADDataGrid via `Object.assign()`. Le widget utilise ces liens pour la navigation automatique.
+
+### Étape 7 : Générer les Tiles (optionnel)
 
 Selon les services disponibles, générer :
 - Tile Grid (si fetchData disponible)
 - Tile Details (si getById disponible)
 - Tile Synth (si getLines disponible)
 
-### Étape 6 : Checklist de validation
+### Étape 8 : Checklist de validation
 
 Avant de présenter le résultat, vérifier :
 
@@ -74,9 +124,14 @@ Avant de présenter le résultat, vérifier :
 - [ ] Les types de retour sont corrects (INFOTABLE avec `aspect.dataShape="DataBox_DS_Identification"` ou JSON)
 - [ ] Les paramètres ont des noms cohérents avec les conventions (id, idcor, idAccount, small, pagination)
 - [ ] Le code JavaScript dans CDATA utilise le bon Helper (`GetInfotable` pour INFOTABLE, `Get` pour JSON)
-- [ ] Les chemins API correspondent aux endpoints réels du controller NestJS
+- [ ] Les chemins API correspondent **exactement** aux noms dans les `@Get()` du controller NestJS (ne pas deviner — les noms sont irréguliers)
 - [ ] Les permissions standard sont présentes (ServiceInvoke pour Users, Visibility pour Everyone)
 - [ ] La balise de fermeture `</Entities>` est présente
+
+**GetTableLinks (si Dashboard Details généré) :**
+- [ ] Une entrée `[table_name]: "DataBox_Dashboard_[Entity]Details&code="` est ajoutée dans GetTableLinks
+- [ ] Si l'entité a des lignes, une entrée `[table_name]_lines` est aussi ajoutée
+- [ ] Le nom de table correspond au nom utilisé dans l'API REST (snake_case)
 
 **Dashboard XML (si généré) :**
 - [ ] Le nom suit la convention `DataBox_Dashboard_[EntityName]`
@@ -84,7 +139,7 @@ Avant de présenter le résultat, vérifier :
 - [ ] Les services référencés dans Data existent réellement
 - [ ] Les DataBindings connectent les bonnes sources aux bonnes cibles
 
-### Étape 7 : Résumé
+### Étape 9 : Résumé
 
 Présenter à l'utilisateur :
 - Fichiers créés avec leur chemin complet

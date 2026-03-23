@@ -109,7 +109,18 @@ Points clés :
 - Configurer les DataBindings entre services et widgets
 - Générer des **UUIDs uniques** pour tous les IDs (ne pas copier ceux d'un autre mashup)
 
-### Étape 5 : Configurer la navigation retour
+### Étape 5 : Mettre à jour GetTableLinks
+
+Pour que la navigation depuis les grilles fonctionne, ajouter une entrée dans `DataBox_Helper_Platform.GetTableLinks` :
+
+```javascript
+// Dans 08-SourceControl/DataBox/Things/DataBox_Helper_Platform.xml, service GetTableLinks
+[table_api_name]: "DataBox_Dashboard_[EntityName]Details&code=",
+```
+
+Sans cette entrée, le clic sur une ligne dans un FCADDataGrid ne pourra pas naviguer vers le Dashboard Details.
+
+### Étape 6 : Configurer la navigation retour
 
 Ajouter un bouton ou breadcrumb qui navigue vers le Dashboard parent. Le pattern utilise un `navigationfunction` avec l'URL du Dashboard parent.
 
@@ -124,6 +135,7 @@ Ajouter un bouton ou breadcrumb qui navigue vers le Dashboard parent. Le pattern
 - [ ] Les UUIDs dans le JSON mashup sont tous uniques
 - [ ] La navigation retour vers le Dashboard parent est configurée
 - [ ] Le Dashboard parent a le binding FCADDataGrid.Details → expression → navigationfunction
+- [ ] **GetTableLinks** mis à jour dans DataBox_Helper_Platform avec l'entrée pour cette entité
 
 ### Étape 7 : Créer les dashboards de lignes (optionnel)
 

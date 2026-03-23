@@ -149,9 +149,11 @@ Skill :
 
 5. **Services JavaScript** : Code dans `<![CDATA[ ... ]]>`. Utiliser `Things["DataBox_Helper_Platform"].GetInfotable({api: "..."})` pour les appels API REST.
 
-6. **Permissions** : ServiceInvoke pour Users, Visibility pour Everyone.
+6. **Noms de routes API : TOUJOURS lire le controller NestJS** : Les noms de sous-routes (lignes, relations) ne suivent pas de pattern régulier. Par exemple `purchaseOrdersLines` (avec s), `salesOrderLines` (sans s), `invoiceLines` (singulier), `quoteLines` (singulier). Ne jamais deviner le nom — toujours le copier depuis le `@Get('...')` du controller.
 
-7. **UUIDs dans les mashups** : Les IDs dans le JSON des mashups doivent être des UUIDs uniques. Générer de nouveaux UUIDs pour chaque nouveau mashup.
+7. **Permissions** : ServiceInvoke pour Users, Visibility pour Everyone.
+
+8. **UUIDs dans les mashups** : Les IDs dans le JSON des mashups doivent être des UUIDs uniques. Générer de nouveaux UUIDs pour chaque nouveau mashup.
 
 ## Documentation ECharts via Context7
 

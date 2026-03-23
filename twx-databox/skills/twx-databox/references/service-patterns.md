@@ -192,6 +192,24 @@ result = selected[Entity];
 </ServiceImplementation>
 ```
 
+## Attention : noms de routes API irréguliers
+
+Les noms de sous-routes dans l'API NestJS ne suivent **aucun pattern régulier**. Il faut toujours les copier depuis le controller, jamais les deviner.
+
+| Entité | Route lignes dans le controller | Piège |
+|--------|-------------------------------|-------|
+| purchaseOrders | `purchaseOrdersLines` | Avec le **s** de Orders |
+| salesOrders | `salesOrderLines` | **Sans** le s |
+| invoices | `invoiceLines` | **Singulier** |
+| quotes | `quoteLines` | **Singulier** |
+| deliveries | `deliveryLines` | **Singulier** |
+| serviceContracts | `serviceContractLines` | **Singulier** |
+| customerAssets | `customerAssetLines` | **Singulier** |
+| purchaseInvoices | `purchaseInvoicesLines` | Avec le **s** |
+| receipts | `receiptsLines` | Avec le **s** |
+
+**Règle absolue** : lire le `@Get('...')` du controller et copier le nom exact.
+
 ## API Helper utilisé
 
 Tous les services DataOps utilisent `Things["DataBox_Helper_Platform"]` avec :

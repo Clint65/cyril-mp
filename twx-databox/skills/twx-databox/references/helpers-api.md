@@ -130,6 +130,41 @@ result = {
 
 Historique des modifications d'une entité, formaté pour FCADVerticalTimeline.
 
+### GetTableLinks() → JSON
+
+Retourne un mapping table API → mashup Dashboard Details. Utilisé par GetGridConfig et GetGridConfigPagination pour permettre la navigation automatique depuis le FCADDataGrid.
+
+```javascript
+result = {
+    articles: "DataBox_Dashboard_ArticlesDetails&code=",
+    articles_cor: "DataBox_Dashboard_ArticlesDetails&idcor=",
+    accounts: "DataBox_Dashboard_AccountsDetails&code=",
+    accounts_address_lines: "DataBox_Dashboard_AccountsAddressDetails&code=",
+    accounts_contact_lines: "DataBox_Dashboard_AccountsContactDetails&code=",
+    quotes: "DataBox_Dashboard_QuotesDetails&code=",
+    quotes_cor: "DataBox_Dashboard_QuotesDetails&idcor=",
+    quotes_lines: "DataBox_Dashboard_QuotesLinesDetails&code=",
+    sales_orders: "DataBox_Dashboard_SalesOrdersDetails&code=",
+    sales_orders_lines: "DataBox_Dashboard_SalesOrdersLinesDetails&code=",
+    invoices: "DataBox_Dashboard_InvoicesDetails&code=",
+    invoices_lines: "DataBox_Dashboard_InvoicesLinesDetails&code=",
+    deliveries: "DataBox_Dashboard_DeliveriesDetails&code=",
+    deliveries_lines: "DataBox_Dashboard_DeliveriesLinesDetails&code=",
+    manufacturing_orders: "DataBox_Dashboard_ManufacturingOrdersDetails&code=",
+    // ... + toutes les autres entités
+};
+```
+
+**Convention :** Clé = nom de table API (snake_case), Valeur = `"NomMashupDetails&parametre="`
+
+**Important :** Quand on crée un nouveau Dashboard Details, il FAUT ajouter l'entrée correspondante ici, sinon la navigation depuis les grilles ne fonctionnera pas.
+
+Fusionné dans la config FCADDataGrid via :
+```javascript
+let links = me.GetTableLinks();
+result = Object.assign({}, result, links);
+```
+
 ### saveInfotableConfig(input) → INFOTABLE
 
 Passthrough pour persister une configuration dans un mashup parameter.
@@ -304,6 +339,7 @@ Utilisé par calculcateTRSIndicators, getMTBF, getDowntimesSumTimeOccurenceGroup
 | Catalogue de tiles DataOps | Platform_Dashboards | getTileCatalog(dashboardName) |
 | Catalogue de tiles Devices | Devices_Dashboards | getTileCatalog() |
 | Visibilité colonnes | Platform_Dashboards | getColumnVisibility(...) |
+| Mapping navigation grille → Details | Platform | GetTableLinks() |
 | Historique entité | Platform | GetHistory(table, idCorrespondence, id) |
 | Calcul TRS/OEE | Helper_TRS (via TS_TRS) | calculcateTRSIndicators(...) |
 | Analyse Pareto arrêts | Helper_TRS (via TS_TRS) | getParetoData(...) |
