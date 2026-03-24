@@ -48,7 +48,8 @@ Quand l'utilisateur demande quelque chose, identifier le cas d'usage :
 | "Quels endpoints API sont disponibles ?" | → Workflow `discover-api-endpoints` |
 | "Ajouter une entité DataOps" / "Nouveau dashboard pour X" | → Workflow `add-dataops-entity` |
 | "Ajouter des services à un ThingShape existant" | → Workflow `add-services-to-existing` |
-| "Créer un dashboard details pour X" | → Workflow `create-details-dashboard` |
+| "Créer un dashboard details pour X" | → Workflow `create-details-dashboard` + `generate-mashup-from-existing` |
+| "Générer un gros mashup à partir d'un existant" | → Workflow `generate-mashup-from-existing` |
 | "Ajouter une tile IIOT" / "Nouvel indicateur device" | → Workflow `add-iiot-tile` |
 | "Créer un service IIOT" / "Requête InfluxDB/PostgreSQL" | → Workflow `create-iiot-services` |
 | "Créer un KPI / indicateur DataOps" / "Graphique stats" | → Workflow `create-kpi-services` |
@@ -77,6 +78,7 @@ Avant toute génération, lire le fichier de référence ET un exemple existant 
 | Tile Device IIOT | `references/tile-patterns.md` | `Mashups/DataBox_Tile_DevicePropertyGraph.xml` |
 | Service IIOT (SQL/Influx) | `references/service-patterns-iiot.md` | `ThingShapes/DataBox_TS_Devices.xml` ou `DataBox_TS_TRS.xml` |
 | Service KPI/Graph ECharts | `references/service-patterns-iiot.md` (gauge) ou `references/service-patterns.md` | `ThingShapes/DataBox_TS_Dash_Comptes.xml` |
+| Gros mashup Details (>50Ko) | `workflows/generate-mashup-from-existing.md` | Le mashup source le plus similaire (même nombre de sous-entités) |
 | Services à ajouter | `references/service-patterns.md` | Le ThingShape cible (lire en entier) |
 
 Tous les fichiers exemples sont dans : `08-SourceControl/DataBox/`
@@ -149,11 +151,15 @@ Skill :
 
 5. **Services JavaScript** : Code dans `<![CDATA[ ... ]]>`. Utiliser `Things["DataBox_Helper_Platform"].GetInfotable({api: "..."})` pour les appels API REST.
 
-6. **Noms de routes API : TOUJOURS lire le controller NestJS** : Les noms de sous-routes (lignes, relations) ne suivent pas de pattern régulier. Par exemple `purchaseOrdersLines` (avec s), `salesOrderLines` (sans s), `invoiceLines` (singulier), `quoteLines` (singulier). Ne jamais deviner le nom — toujours le copier depuis le `@Get('...')` du controller.
+6. **Noms de routes API : TOUJOURS lire le controller NestJS** : Les noms de sous-routes ne suivent pas de pattern régulier (ex: `purchaseOrdersLines` avec s, `salesOrderLines` sans s, `invoiceLines` singulier). Ne jamais deviner — copier depuis le `@Get('...')` du controller.
 
-7. **Permissions** : ServiceInvoke pour Users, Visibility pour Everyone.
+7. **Préfixer les noms de services** : Toutes les ThingShapes sont implémentées par le même Thing. Les services de sous-entités partagées (addressLines, contactLines) doivent être préfixés avec l'entité parente pour éviter les conflits : `getSupplierAddressLines` et non `getAddressLines`. Voir `references/service-patterns.md` section "Règle critique : préfixer".
 
-8. **UUIDs dans les mashups** : Les IDs dans le JSON des mashups doivent être des UUIDs uniques. Générer de nouveaux UUIDs pour chaque nouveau mashup.
+8. **Gros mashups (>50Ko) : utiliser cp+sed+python** : Ne pas tenter de générer directement un mashup Details de >3000 lignes. Utiliser le workflow `generate-mashup-from-existing` : copier un mashup similaire, transformer par sed, régénérer les UUIDs par script Python, puis adapter manuellement les services au contexte métier. **Toujours auditer les résidus après sed** (`grep -ci`).
+
+9. **Permissions** : ServiceInvoke pour Users, Visibility pour Everyone.
+
+10. **UUIDs dans les mashups** : Les IDs dans le JSON des mashups doivent être des UUIDs uniques. Régénérer tous les UUIDs après un cp+sed.
 
 ## Documentation ECharts via Context7
 
@@ -215,4 +221,5 @@ Endpoints standards (hérités d'AbstractController) :
 | `workflows/create-tile-catalog-entry.md` | Enregistrer une tile dans le catalogue |
 | `workflows/create-iiot-services.md` | Créer des services IIOT (requêtes PostgreSQL/InfluxDB + graphiques ECharts) |
 | `workflows/create-kpi-services.md` | Créer des services KPI DataOps (stats API + graphiques ECharts) |
+| `workflows/generate-mashup-from-existing.md` | Générer un gros mashup par cp+sed+python (Details, >50Ko) |
 | `workflows/add-iiot-tile.md` | Ajouter une tile IIOT pour un équipement |

@@ -3,6 +3,28 @@
 ## Fichier de référence
 Analysé depuis : `08-SourceControl/DataBox/ThingShapes/DataBox_TS_Accounts.xml`
 
+## Règle critique : préfixer les noms de services
+
+Toutes les ThingShapes DataOps sont implémentées par le **même Thing** (`DataBox_Helper_Platform`). Si deux ThingShapes ont un service avec le même nom, il y a **conflit**.
+
+**Règle : toujours préfixer les noms de services avec le nom de l'entité parente.**
+
+| Mauvais (conflit) | Bon (préfixé) | Pourquoi |
+|-------------------|---------------|----------|
+| `getAddressLines` | `getSupplierAddressLines` | Conflit avec `getAddressLines` de DataBox_TS_Accounts |
+| `getContactLines` | `getCarrierContactLines` | Conflit avec `getContactLines` de DataBox_TS_Accounts |
+| `getAddressLine` | `getSupplierAddressLine` | Conflit avec `getAddressLine` de DataBox_TS_Accounts |
+| `getContactLine` | `getSupplierContactLine` | Conflit avec `getContactLine` de DataBox_TS_Accounts |
+| `getAddressLinesGridConfig` | `getSupplierAddressLinesGridConfig` | Conflit aussi |
+| `setSelectedAccount` | `setSelectedSupplier` | Chaque entité a son propre passthrough |
+
+**Quand préfixer :**
+- Dès qu'une sous-entité (addressLines, contactLines, etc.) est partagée entre plusieurs entités parentes (Accounts, Suppliers, Carriers)
+- Pour les services passthrough (`setSelected[Entity]`)
+- Pour les GridConfig de sous-entités partagées
+
+**Le service principal de l'entité** (`getSupplier`, `getCarrier`) n'a pas besoin de préfixe supplémentaire car le nom de l'entité est déjà unique.
+
 ## Quand utiliser quel pattern ?
 
 | Situation | Pattern à utiliser | Exemple |

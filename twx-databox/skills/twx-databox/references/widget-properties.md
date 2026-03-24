@@ -6,8 +6,9 @@ Sources : repos GitLab `4cad-group/rd-4cad/data-platform/dashboarding/extensions
 
 1. [FCADDataGrid](#fcaddatagrid-databox-twx-grid) - Grille de données (Tabulator)
 2. [FCADECharts](#fcadecharts-databox-twx-echarts) - Graphiques (Apache ECharts)
-3. [FCADGridStack2](#fcadgridstack2-databox-twx-gridstack) - Conteneur dashboard drag-and-drop
-4. [FCADVerticalTimeline](#fcadverticaltimeline-databox-twx-verticaltimeline) - Timeline verticale
+3. [FCADDynamicPanel](#fcaddynamicpanel-databox-twx-dynamicpanel) - Panneau repliable + template onglet Details
+4. [FCADGridStack2](#fcadgridstack2-databox-twx-gridstack) - Conteneur dashboard drag-and-drop
+5. [FCADVerticalTimeline](#fcadverticaltimeline-databox-twx-verticaltimeline) - Timeline verticale
 
 ---
 
@@ -140,6 +141,96 @@ Basé sur **Apache ECharts**. Widget de visualisation (graphiques, jauges, camem
   "xAxis": {"type": "category", "data": ["Jan", "Feb", "Mar"]},
   "yAxis": {"type": "value"},
   "series": [{"data": [120, 200, 150], "type": "bar"}]
+}
+```
+
+---
+
+## FCADDynamicPanel (databox-twx-dynamicpanel)
+
+Panneau repliable utilisé dans les Dashboard Details pour les onglets de sous-entités.
+
+### Propriétés principales
+
+| Propriété | Type | Binding | Description |
+|-----------|------|---------|-------------|
+| Title | STRING | - | Titre de l'onglet |
+| Icon | STRING | - | Icône FontAwesome (ex: "fa-solid fa-file-invoice") |
+| Collapsed | BOOLEAN | - | Replié par défaut (true dans les Details) |
+| Margin | STRING | - | Marge (défaut: "5") |
+| ShowDataLoading | BOOLEAN | - | Affiche le spinner |
+
+### Template : FCADDynamicPanel + FCADDataGrid dans un Dashboard Details
+
+Quand on ajoute un onglet de sous-entité dans un mashup Details, il faut 3 widgets imbriqués : un flexcontainer wrapper, un FCADDynamicPanel, et un FCADDataGrid à l'intérieur.
+
+**Points critiques :**
+1. `OverrideChildrenAbsolute: true` sur le flexcontainer wrapper — sans ça le panel ne se dimensionne pas
+2. `flex-grow: 0` et `flex-direction: "row"` sur le wrapper (pas column/1)
+3. `FullHeight: false` et `ResponsiveLayout: false` sur le FCADDataGrid
+4. Ne pas ajouter `Config: {}` comme propriété du widget grid — c'est un binding, pas une propriété
+5. `CustomClass: "noscroll bg-transparent tile"` sur le wrapper (cet ordre exact)
+6. Inclure **toutes** les propriétés — ThingWorx ne gère pas bien les propriétés manquantes
+
+**Wrapper flexcontainer :**
+```json
+{
+  "CustomClass": "noscroll bg-transparent tile",
+  "OverrideChildrenAbsolute": true,
+  "ResponsiveLayout": true,
+  "ShowDataLoading": true,
+  "Type": "flexcontainer",
+  "Visible": true,
+  "Z-index": 10,
+  "align-content": "flex-start",
+  "align-items": "flex-start",
+  "flex-basis": "auto",
+  "flex-direction": "row",
+  "flex-grow": 0,
+  "flex-shrink": 1,
+  "flex-wrap": "nowrap",
+  "justify-content": "flex-start",
+  "positioning": "responsive"
+}
+```
+
+**FCADDynamicPanel (enfant du wrapper) :**
+```json
+{
+  "Collapsed": true,
+  "Icon": "fa-solid fa-...",
+  "Margin": "5",
+  "ResponsiveLayout": true,
+  "ShowDataLoading": true,
+  "Title": "Titre de l'onglet",
+  "Type": "FCADDynamicPanel",
+  "Visible": true,
+  "Z-index": 10
+}
+```
+
+**FCADDataGrid (enfant du panel) :**
+```json
+{
+  "ActionId": "",
+  "CheckboxSelection": false,
+  "ColumnEditable": false,
+  "Data": {},
+  "DateFormat": "DD/MM/YYYY HH:mm:ss",
+  "Events": ["Details"],
+  "FullHeight": false,
+  "HasSelectedRow": false,
+  "IsMenu": false,
+  "IsTree": false,
+  "Margin": "5",
+  "RefreshRate": 1000,
+  "ResponsiveLayout": false,
+  "SelectedRow": {},
+  "SelectedRows": {},
+  "ShowDataLoading": true,
+  "Type": "FCADDataGrid",
+  "Visible": true,
+  "Z-index": 10
 }
 ```
 

@@ -5,7 +5,7 @@
   },
   "metadata": {
     "description": "Claude Code skills: Agile planning, Databox NL→SQL & ThingWorx development",
-    "version": "1.4.0"
+    "version": "1.5.0"
   },
   "plugins": [
     {
@@ -46,7 +46,7 @@
       "name": "twx-databox",
       "source": "./twx-databox",
       "description": "Développement ThingWorx assisté pour le projet DataBox. Génère des services (ThingShapes XML), dashboards (GridStack) et tiles (Grid, Synth, Metric) à partir des patterns existants. Découvre les endpoints API REST NestJS.",
-      "version": "1.1.0",
+      "version": "1.2.0",
       "author": {
         "name": "Cyril Brandy"
       },

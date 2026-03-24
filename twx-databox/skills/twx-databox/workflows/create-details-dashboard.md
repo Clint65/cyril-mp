@@ -100,9 +100,14 @@ Le binding dans le JSON :
 
 ### Étape 4 : Générer le DashboardDetails
 
+**Pour les gros mashups (>50Ko)** : utiliser le workflow `generate-mashup-from-existing.md` (cp+sed+python). Ne jamais tenter de générer directement un fichier >3000 lignes.
+
+**Important** : choisir un modèle avec le même nombre de sous-entités que la cible. Si le modèle a plus de sous-entités, il y aura des doublons de services, bindings et events dans le JSON.
+
 Créer `08-SourceControl/DataBox/Mashups/DataBox_Dashboard_[Entity]Details.xml` en suivant le mashup de référence.
 
 Points clés :
+- Pour chaque sous-entité, utiliser le template **FCADDynamicPanel + FCADDataGrid** documenté dans `references/widget-properties.md` section FCADDynamicPanel. Attention aux propriétés critiques (OverrideChildrenAbsolute, flex-grow:0, FullHeight:false, pas de Config:{} sur la grid)
 - Déclarer les **ParameterDefinitions** pour recevoir l'id depuis la navigation
 - Dans la section Data, appeler `get[Entity](id)` pour charger l'entité
 - Pour chaque sous-entité, appeler `get[Entity][SubEntity](id)` et `get[Entity][SubEntity]GridConfig()`
