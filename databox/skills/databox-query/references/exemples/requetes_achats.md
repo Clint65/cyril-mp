@@ -33,7 +33,7 @@ LIMIT 10;
 - Nom fournisseur = `suppliers_name` (pas `company_name_1` comme pour accounts)
 - Montant = `purchase_orders_total_amount_excl_vat` (pas `amount_lines_excl_vat`)
 
-**Note :** Table `purchase_orders` non alimentée dans le jeu actuel.
+**Note :** Pattern identique aux jointures sur accounts, avec `idcor_supplier` au lieu de `idcor_account`.
 
 ---
 
@@ -163,7 +163,7 @@ ORDER BY p.projects_project_code;
 - Même pattern idcor que pour les factures/commandes
 - Tables liées : `projects_tasks_lines`, `projects_tasks_operations_lines`
 
-**Note :** Table `projects` non alimentée dans le jeu actuel.
+**Note :** Même pattern idcor que pour les factures/commandes.
 
 ---
 

@@ -20,6 +20,13 @@
 | Délai de paiement | Jours entre facture et paiement | `invoices`, `open_items` | `invoices_invoice_date`, `open_items_payment_date` | `end_date IS NULL` |
 | Commande en retard | Ligne de commande non livrée après la date demandée | `sales_orders_lines` | `asked_delivery_date`, `quantity_to_deliver` | `end_date IS NULL`, `quantity_to_deliver > 0` |
 | Commercial | Représentant commercial lié aux documents | `sales_reps` | `sales_reps_rep_code`, `sales_reps_name` | Résolution via `idcor_sales_rep` + `id_mapping` |
+| Contrat de service | Contrat maintenance/support lié à un client | `service_contracts` | `service_contracts_contract_code`, `annual_royalty` | `end_date IS NULL`, `is_canceled = false`, `is_closed = false` |
+| Parc installé | Équipements/licences déployés chez un client | `customer_assets`, `customer_assets_lines` | `customer_assets_asset_code`, `quantity` | `end_date IS NULL`, lien client via `customer_assets_lines_idcor_account` |
+| Sous-traitance | Prestations achetées à des sous-traitants | `bom_subcontracting`, `purchase_orders` | Recette via BOM, achats via PO | Même article vendu et acheté, marge = spread |
+| Nomenclature commerciale | Pack/bundle de plusieurs articles | `bom_commercial`, `bom_commercial_lines` | `bom_commercial_product_code` | Catalogue de packs de référence |
+| Encours fournisseur | Montant restant dû à un fournisseur | `open_items` | `business_partner_type = 'supplier'` | `end_date IS NULL`, `* open_items_sign` |
+| Élément de facturation | Frais/remise/taxe sur commande d'achat | `purchase_orders_invoicing_elements` | `element_value`, `is_rate`, `sign` | Rattaché à `purchase_orders_id_databox` |
+| Taux de service | % quantité livrée vs commandée | `sales_orders_lines` | `delivered_quantity / ordered_quantity` | `end_date IS NULL`, `order_status IN (1, 2)` |
 
 ## Détails par terme
 
@@ -282,3 +289,66 @@
   LEFT JOIN databox.sales_reps sr ON rep_im.id_databox = sr.sales_reps_id_databox
   ```
 - **Ambiguïtés résolues :** Même pattern de résolution idcor que pour les comptes, avec alias distinct (`rep_im`).
+
+### Contrat de service
+- **Définition :** Contrat de maintenance ou support lié à un client, avec dates de début/fin, renouvellement automatique, et montant annuel
+- **Table(s) :** `service_contracts` (en-tête), `service_contracts_lines` (lignes articles couverts)
+- **Colonne(s) :** `service_contracts_contract_code`, `service_contracts_start_date`, `service_contracts_end_date`, `service_contracts_is_automatic_renewal`, `service_contracts_annual_royalty`, `service_contracts_is_canceled`, `service_contracts_is_closed`
+- **Résolution client :** Via `service_contracts_idcor_sold_to_account` → `id_mapping` → `accounts`
+- **Lignes :** Chaque ligne référence un article (`service_contracts_lines_idcor_product`) avec quantité et prix unitaire
+- **Contrat actif :** `is_canceled = false AND is_closed = false AND end_date >= NOW()`
+- **Ambiguïtés résolues :** Un contrat peut être renouvelé automatiquement (`is_automatic_renewal`). La fréquence de renouvellement est en `renewable_frequency` + `renewable_unit`.
+
+### Parc installé
+- **Définition :** Ensemble des équipements, licences ou produits déployés chez un client
+- **Table(s) :** `customer_assets` (l'actif lui-même), `customer_assets_lines` (les affectations aux clients)
+- **Colonne(s) :** `customer_assets_asset_code`, `customer_assets_asset_designation`, `customer_assets_quantity`, `customer_assets_brand`, `customer_assets_start_date`
+- **Lien client :** Via `customer_assets_lines_idcor_account` → `id_mapping` → `accounts`
+- **Lien article :** Via `customer_assets_idcor_product` → `id_mapping` → `articles`
+- **Lien contrat :** Via `customer_assets_idcor_service_contract_line` (optionnel)
+- **Ambiguïtés résolues :** Un asset peut exister sans contrat de maintenance (utile pour détecter les actifs non couverts).
+
+### Sous-traitance
+- **Définition :** Achat de prestations de services ou de matériel à des fournisseurs externes (freelances, ESN) pour revente au client final
+- **Table(s) :** `bom_subcontracting` (recette de sous-traitance par article), `bom_subcontracting_service_lines` (services sous-traités), `bom_subcontracting_material_lines` (matériel fourni au sous-traitant)
+- **Colonne(s) :** `bom_subcontracting_idcor_product` (article auquel la recette s'applique), quantité et unité sur les lignes
+- **Cycle opérationnel :** Les achats effectifs de sous-traitance passent par `purchase_orders` → `purchase_invoices` → `receipts` avec le fournisseur sous-traitant
+- **Ambiguïtés résolues :** La BOM décrit la recette (combien de jours sous-traiter par jour vendu), les purchase_orders tracent les achats réels.
+
+### Nomenclature commerciale
+- **Définition :** Pack ou bundle commercial regroupant plusieurs articles vendus ensemble (ex : licences + consulting + formation + maintenance)
+- **Table(s) :** `bom_commercial` (le pack), `bom_commercial_lines` (les composants du pack)
+- **Colonne(s) :** `bom_commercial_product_code`, `bom_commercial_designation`, lignes avec `bom_commercial_lines_idcor_product`, quantité, unité
+- **Ambiguïtés résolues :** La BOM commerciale n'est pas directement liée aux devis/commandes — c'est un catalogue de packs de référence.
+
+### Encours fournisseur
+- **Définition :** Montant restant dû à un fournisseur (factures d'achat reçues non encore intégralement payées)
+- **Table(s) :** `open_items`
+- **Colonne(s) :** Mêmes colonnes que l'encours client, mais avec `open_items_business_partner_type = 'supplier'`
+- **Résolution fournisseur :** Via `open_items_idcor_partner` → `id_mapping` → `suppliers`
+- **Lien document source :** Via `open_items_idcor_document` → `id_mapping` → `purchase_invoices` (si `document_type ≠ '*PO'`) ou `purchase_orders` (si `document_type = '*PO'`)
+- **Exemple SQL :**
+  ```sql
+  SELECT s.suppliers_name, SUM((oi.open_items_amount_in_company_currency - oi.open_items_paid_amount_in_company_currency) * oi.open_items_sign) AS encours
+  FROM databox.open_items oi
+  INNER JOIN databox.id_mapping oi_im ON oi.open_items_id_databox = oi_im.id_databox
+  LEFT JOIN databox.id_mapping sup_im ON oi.open_items_idcor_partner = sup_im.id_correspondence AND sup_im.end_date IS NULL
+  LEFT JOIN databox.suppliers s ON sup_im.id_databox = s.suppliers_id_databox
+  WHERE oi_im.end_date IS NULL AND oi.open_items_business_partner_type = 'supplier'
+  GROUP BY s.suppliers_name HAVING SUM((oi.open_items_amount_in_company_currency - oi.open_items_paid_amount_in_company_currency) * oi.open_items_sign) > 0
+  ORDER BY encours DESC;
+  ```
+
+### Élément de facturation
+- **Définition :** Frais, remises ou taxes ajoutés au montant des lignes d'une commande d'achat (transport, escompte, TVA import, remise volume...)
+- **Table(s) :** `purchase_orders_invoicing_elements`
+- **Colonne(s) :** `purchase_orders_invoicing_elements_code`, `purchase_orders_invoicing_elements_element_value`, `purchase_orders_invoicing_elements_is_rate` (true = pourcentage, false = montant fixe), `purchase_orders_invoicing_elements_sign` (+1 = charge, -1 = remise), `purchase_orders_invoicing_elements_calcul_base`
+- **Lien :** Rattaché à une commande d'achat via `purchase_orders_id_databox`
+
+### Taux de service
+- **Définition :** Pourcentage de la quantité commandée effectivement livrée, mesurant la fiabilité de la chaîne de livraison
+- **Table(s) :** `sales_orders_lines`
+- **Colonne(s) :** `sales_orders_lines_ordered_quantity`, `sales_orders_lines_delivered_quantity`
+- **Formule :** `SUM(delivered_quantity) / NULLIF(SUM(ordered_quantity), 0) * 100`
+- **Filtres :** `end_date IS NULL`, `sales_orders_order_status IN (1, 2)`
+- **Ambiguïtés résolues :** Se calcule sur les lignes (pas les en-têtes). Un taux de 100% = tout livré.

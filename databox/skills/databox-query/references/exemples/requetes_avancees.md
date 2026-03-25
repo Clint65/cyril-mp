@@ -192,5 +192,5 @@ ORDER BY score_risque DESC, dc.derniere_cde ASC;
 
 **Points clés :**
 - Deux CTE pour calculer chaque signal indépendamment
-- Score combiné = somme des risques (0-2, extensible à 3 avec encours quand open_items sera alimenté)
+- Score combiné = somme des risques (extensible avec encours via open_items, délai de paiement, etc.)
 - Seuils paramétrables (3 mois inactivité, -20% CA)

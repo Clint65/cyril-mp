@@ -70,7 +70,7 @@ ORDER BY encours DESC;
 - Résolution client via `open_items_idcor_partner`
 - `HAVING > 0` pour n'afficher que les encours positifs
 
-**Note :** Table `open_items` non alimentée dans le jeu de données actuel. Syntaxe validée.
+**Note :** Pour filtrer par type de partenaire, ajouter `AND oi.open_items_business_partner_type = 'customer'`.
 
 ---
 
@@ -110,7 +110,7 @@ ORDER BY a.accounts_company_name_1;
 - Ventilation par tranche d'ancienneté via `CASE WHEN` sur `open_items_payment_date`
 - 4 tranches : 0-30j, 30-60j, 60-90j, >90j
 
-**Note :** Syntaxe validée, à tester avec données réelles.
+**Note :** Pour ne voir que les encours clients, ajouter `AND oi.open_items_business_partner_type = 'customer'`.
 
 ---
 

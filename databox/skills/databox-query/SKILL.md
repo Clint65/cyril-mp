@@ -2,7 +2,7 @@
 name: databox-query
 description: >
   Interroger la base PostgreSQL Databox (ERP/CRM) en langage naturel français.
-  Traduit les questions business en SQL, exécute via mcp__databox-db__query, et
+  Traduit les questions business en SQL, exécute via mcp__databox-postgres__query, et
   retourne une réponse en langage naturel avec les données.
   Utiliser ce skill dès qu'une question porte sur les données métier Databox :
   chiffre d'affaires, clients, factures, commandes, devis, articles, fournisseurs,
@@ -52,6 +52,7 @@ Détermine les tables, colonnes et jointures nécessaires.
 - Ventes (10 exemples) : `references/exemples/requetes_ventes.md`
 - Facturation & encours (5 exemples) : `references/exemples/requetes_facturation.md`
 - Achats, production & projets (5 exemples) : `references/exemples/requetes_achats.md`
+- Services, parc installé & cross-domaine : `references/exemples/requetes_services_assets.md`
 - Cas avancés — multi-devises, value_lists, risque (5 exemples) : `references/exemples/requetes_avancees.md`
 
 Les formules SQL dans `kpis.md` et les exemples dans `references/exemples/` ont été validées
@@ -66,13 +67,36 @@ Databox (détaillées dans l'étape VALIDER ci-dessous).
 **Relations clés entre entités :**
 
 ```
-accounts ←── quotes          (quotes_idcor_account)
-accounts ←── sales_orders    (sales_orders_idcor_sold_to_account)
-accounts ←── invoices        (invoices_idcor_account)
-quotes   ←── sales_orders    (sales_orders_idcor_quote)
-articles ←── *_lines         (idcor_product / id_product::text)
-sales_reps ←── documents     (idcor_sales_rep)
-suppliers ←── purchase_orders (idcor_supplier)
+Cycle vente :
+  accounts ←── quotes              (quotes_idcor_account)
+  accounts ←── sales_orders        (sales_orders_idcor_sold_to_account)
+  accounts ←── invoices            (invoices_idcor_account)
+  accounts ←── deliveries          (deliveries_idcor_sold_to_account)
+  quotes   ←── sales_orders        (sales_orders_idcor_quote)
+  articles ←── *_lines             (idcor_product / id_product::text)
+  sales_reps ←── documents         (idcor_sales_rep)
+
+Cycle achat :
+  suppliers ←── purchase_orders    (idcor_supplier)
+  suppliers ←── purchase_invoices  (idcor_supplier)
+  suppliers ←── receipts           (idcor_supplier)
+
+Services & parc installé :
+  accounts ←── service_contracts   (idcor_sold_to_account)
+  accounts ←── customer_assets_lines (idcor_account)
+  accounts ←── open_items          (idcor_partner)
+
+Projets (transverse) :
+  projects ←── quotes / sales_orders / invoices / deliveries / purchase_orders (idcor_project)
+
+Open items → documents source :
+  open_items → invoices / sales_orders / purchase_orders / purchase_invoices
+    (open_items_id_document / open_items_idcor_document)
+    Règle de routage par type :
+      business_partner_type='customer' + document_type='*SO'  → sales_orders
+      business_partner_type='customer' + document_type≠'*SO'  → invoices
+      business_partner_type='supplier' + document_type='*PO'  → purchase_orders
+      business_partner_type='supplier' + document_type≠'*PO'  → purchase_invoices
 ```
 
 Toutes les relations cross-entités passent par `id_mapping` via les colonnes `*_idcor_*`.
@@ -181,7 +205,7 @@ les documente différemment — les value_lists priment.
 
 ### Étape 5 — EXÉCUTER
 
-1. Exécute la requête via l'outil `mcp__databox-db__query`
+1. Exécute la requête via l'outil `mcp__databox-postgres__query`
 2. Si la requête échoue, analyse l'erreur, corrige et réessaie
 3. Formate la réponse en langage naturel :
    - Résumé clair de la réponse à la question posée
@@ -197,6 +221,6 @@ les documente différemment — les value_lists priment.
 - Réponds toujours en **français**
 - Ne suppose jamais une définition métier sans vérifier le glossaire
 - Si la question est ambiguë, pose une question de clarification
-- Si une table n'est pas alimentée dans le jeu de données (ex: `open_items`), indique-le
+- Si une requête retourne 0 résultats, vérifie que la table est alimentée (un simple `SELECT COUNT(*)` suffit) avant de conclure
 - Limite les résultats avec `LIMIT` quand c'est pertinent (top N, listes longues)
 - N'exécute que des requêtes en lecture seule (SELECT)

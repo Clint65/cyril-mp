@@ -14,6 +14,12 @@
 | Panier moyen | Panier moyen | `sales_orders` |
 | Top N clients par CA | CA facturé, Commercial | `invoices`, `accounts` |
 | Délai moyen de paiement | Délai de paiement | `invoices`, `open_items` |
+| Encours fournisseur | Encours fournisseur | `open_items` |
+| Taux de service livraison | Taux de service | `sales_orders_lines` |
+| Suivi production (OF par statut) | — | `manufacturing_orders` |
+| Taux de rejet production | — | `manufactured_products_lines` |
+| CA récurrent (contrats) | Contrat de service | `service_contracts` |
+| Couverture parc installé | Parc installé, Contrat de service | `customer_assets`, `service_contracts` |
 
 ---
 
@@ -276,6 +282,129 @@
     AND i.invoices_invoice_date >= :date_debut
     AND i.invoices_invoice_date < :date_fin;
   ```
-- **Exemple de résultat :** Non disponible (table `open_items` non alimentée dans le jeu de données actuel)
-- **Règles Databox appliquées :** `end_date IS NULL` sur les deux id_mapping (aliases `oi_im` et `i_im`), jointure via `document_number = invoice_code`
-- **Note :** La jointure `open_items → invoices` via `document_number` devra être vérifiée lorsque les données open_items seront disponibles. Le lien pourrait nécessiter un ajustement (idcor ou autre clé).
+- **Règles Databox appliquées :** `end_date IS NULL` sur les deux id_mapping (aliases `oi_im` et `i_im`), jointure via `open_items_idcor_document` → `id_mapping` → `invoices`
+- **Variante :** On peut aussi joindre via `open_items_document_number = invoices_invoice_code` (lien textuel) ou via `open_items_id_document` (lien par id_databox)
+
+---
+
+### Encours fournisseur
+
+- **Description :** Montant total restant dû aux fournisseurs
+- **Source glossaire :** Encours fournisseur
+- **Formule SQL :**
+  ```sql
+  SELECT
+    s.suppliers_name AS fournisseur,
+    SUM((oi.open_items_amount_in_company_currency - oi.open_items_paid_amount_in_company_currency)
+      * oi.open_items_sign) AS encours
+  FROM databox.open_items oi
+  INNER JOIN databox.id_mapping oi_im ON oi.open_items_id_databox = oi_im.id_databox
+  LEFT JOIN databox.id_mapping sup_im
+    ON oi.open_items_idcor_partner = sup_im.id_correspondence AND sup_im.end_date IS NULL
+  LEFT JOIN databox.suppliers s ON sup_im.id_databox = s.suppliers_id_databox
+  WHERE oi_im.end_date IS NULL
+    AND oi.open_items_business_partner_type = 'supplier'
+  GROUP BY s.suppliers_name
+  HAVING SUM((oi.open_items_amount_in_company_currency - oi.open_items_paid_amount_in_company_currency)
+    * oi.open_items_sign) > 0
+  ORDER BY encours DESC;
+  ```
+- **Règles Databox appliquées :** `end_date IS NULL`, `open_items_sign`, filtre `business_partner_type = 'supplier'`
+
+---
+
+### Taux de service livraison
+
+- **Description :** Pourcentage de la quantité commandée effectivement livrée
+- **Source glossaire :** Taux de service
+- **Formule SQL :**
+  ```sql
+  SELECT
+    ROUND(100.0 * SUM(sol.sales_orders_lines_delivered_quantity)
+      / NULLIF(SUM(sol.sales_orders_lines_ordered_quantity), 0), 2) AS taux_service_pct
+  FROM databox.sales_orders_lines sol
+  INNER JOIN databox.sales_orders so ON sol.sales_orders_id_databox = so.sales_orders_id_databox
+  INNER JOIN databox.id_mapping im ON so.sales_orders_id_databox = im.id_databox
+  WHERE im.end_date IS NULL
+    AND so.sales_orders_order_status IN (1, 2);
+  ```
+- **Variante :** Par client, par article, par période
+
+---
+
+### Suivi production — OF par statut
+
+- **Description :** Répartition des ordres de fabrication par statut (planifié, lancé, en cours, terminé, clos)
+- **Formule SQL :**
+  ```sql
+  SELECT
+    mo.manufacturing_orders_status AS code,
+    vll.label AS statut,
+    COUNT(*) AS nb_of
+  FROM databox.manufacturing_orders mo
+  INNER JOIN databox.id_mapping im ON mo.manufacturing_orders_id_databox = im.id_databox
+  LEFT JOIN databox.value_list_column_config vlcc ON vlcc.column_name = 'manufacturing_orders_status'
+  LEFT JOIN databox.value_list_entry vle
+    ON vle.value_list_id = vlcc.value_list_id AND vle.neutral_code = mo.manufacturing_orders_status::text
+  LEFT JOIN databox.value_list_label vll ON vll.entry_id = vle.id AND vll.locale = 'fr'
+  WHERE im.end_date IS NULL
+  GROUP BY mo.manufacturing_orders_status, vll.label
+  ORDER BY mo.manufacturing_orders_status;
+  ```
+
+---
+
+### Taux de rejet production
+
+- **Description :** Pourcentage de produits rejetés par rapport à la quantité lancée
+- **Formule SQL :**
+  ```sql
+  SELECT
+    SUM(mpl.manufactured_products_lines_quantity) AS qty_lancee,
+    SUM(mpl.manufactured_products_lines_produced_quantity) AS qty_produite,
+    SUM(mpl.manufactured_products_lines_rejected_quantity) AS qty_rejetee,
+    ROUND(100.0 * SUM(mpl.manufactured_products_lines_rejected_quantity)
+      / NULLIF(SUM(mpl.manufactured_products_lines_quantity), 0), 2) AS taux_rejet_pct
+  FROM databox.manufacturing_orders mo
+  INNER JOIN databox.id_mapping im ON mo.manufacturing_orders_id_databox = im.id_databox
+  INNER JOIN databox.manufactured_products_lines mpl
+    ON mpl.manufacturing_orders_id_databox = mo.manufacturing_orders_id_databox
+  WHERE im.end_date IS NULL;
+  ```
+- **Variante :** Par poste de travail (via `operations_lines_workstation_code`), par période
+
+---
+
+### CA récurrent (contrats de service)
+
+- **Description :** Montant annuel total des contrats de service actifs (revenus prévisibles)
+- **Formule SQL :**
+  ```sql
+  SELECT
+    COUNT(*) AS nb_contrats_actifs,
+    SUM(sc.service_contracts_annual_royalty) AS ca_recurrent_annuel
+  FROM databox.service_contracts sc
+  INNER JOIN databox.id_mapping im ON sc.service_contracts_id_databox = im.id_databox
+  WHERE im.end_date IS NULL
+    AND sc.service_contracts_is_canceled = false
+    AND sc.service_contracts_is_closed = false
+    AND sc.service_contracts_end_date >= NOW();
+  ```
+
+---
+
+### Couverture parc installé
+
+- **Description :** Nombre d'actifs client avec et sans contrat de maintenance actif
+- **Formule SQL :**
+  ```sql
+  SELECT
+    COUNT(*) AS total_assets,
+    COUNT(ca.customer_assets_idcor_service_contract_line) AS avec_contrat,
+    COUNT(*) - COUNT(ca.customer_assets_idcor_service_contract_line) AS sans_contrat,
+    ROUND(100.0 * COUNT(ca.customer_assets_idcor_service_contract_line)
+      / NULLIF(COUNT(*), 0), 2) AS taux_couverture_pct
+  FROM databox.customer_assets ca
+  INNER JOIN databox.id_mapping im ON ca.customer_assets_id_databox = im.id_databox
+  WHERE im.end_date IS NULL;
+  ```
