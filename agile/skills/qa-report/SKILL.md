@@ -37,8 +37,8 @@ find .planning -name "US-*-PLAN.md" 2>/dev/null | sort
 ```
 
 Apply scope filter if provided:
-- `E01` → filter to `.planning/epics/E01-*/`
-- `F01` → filter to `*/features/F01-*/`
+- `E01` → filter to `.planning/E01-*/`
+- `F01` → filter to `.planning/E*-*/F01-*/`
 - `all` → no filter
 
 **2. Build story inventory:**

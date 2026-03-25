@@ -52,17 +52,9 @@ Does this capture the requirements? (yes / add more / adjust)"
 </step>
 
 <step name="estimate_points">
-Present point estimate inline:
+Present point estimate inline (see `references/user-story-format.md` for the full scale):
 
 "Based on complexity, I estimate this at X points.
-
-Story point guide:
-- 1 = trivial (<1hr)
-- 2 = small (1-2hr)
-- 3 = medium (half-day)
-- 5 = larger (full day)
-- 8 = large (1-2 days) - consider splitting
-
 Does X points feel right? (yes / adjust to Y)"
 
 **If >5 points:** Recommend splitting into multiple stories.
@@ -107,29 +99,14 @@ What's next?
 
 </process>
 
-<invest_check>
-Before finalizing, verify story is INVEST:
+<invest_and_ac_check>
+Before finalizing, verify the story passes INVEST criteria and AC guidelines.
+See `references/user-story-format.md` for full INVEST checklist and AC quality guidelines.
 
-- **I**ndependent: Can be developed without other stories
-- **N**egotiable: Details can be refined
-- **V**aluable: Delivers value to user
-- **E**stimable: Can be sized (has clear scope)
-- **S**mall: Fits in one session (1-5 points)
-- **T**estable: Clear pass/fail criteria (ACs)
-
-If story fails INVEST, adjust before writing.
-</invest_check>
-
-<ac_guidelines>
-**Good acceptance criteria:**
-- Testable (can verify pass/fail)
-- Independent (don't depend on other ACs)
-- Focused (one behavior each)
-- Complete (cover the story scope)
-
-**Target:** 2-4 acceptance criteria per story
-**If >5 ACs:** Story may be too large, consider splitting
-</ac_guidelines>
+**Quick checks:**
+- Story passes INVEST? If not, adjust before writing.
+- 2-4 acceptance criteria? If >5, consider splitting.
+</invest_and_ac_check>
 
 <success_criteria>
 User story is complete when:

@@ -124,14 +124,11 @@ Total: 3 stories, consistent quality
 
 ## Story Point Guidelines
 
-**1 point:** Trivial change, <1 hour, well-understood
-**2 points:** Small change, 1-2 hours, straightforward
-**3 points:** Medium change, half-day, some complexity
-**5 points:** Larger change, full day, multiple files/components
-**8 points:** Large change, 1-2 days - **MUST SPLIT**
+See `references/user-story-format.md` for the full story point scale.
 
-If estimated >5 points, strongly consider splitting.
-If estimated >8 points, always split.
+**Splitting rules:**
+- If estimated >5 points, strongly consider splitting.
+- If estimated >8 points, always split.
 
 ## Mapping Acceptance Criteria to Tasks
 
