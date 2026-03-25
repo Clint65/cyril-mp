@@ -5,7 +5,7 @@
 ## Installation
 
 ```bash
-/plugin marketplace add Clint65/agile-skill
+/plugin marketplace add Clint65/cyril-mp
 ```
 
 ## Plugins
@@ -15,7 +15,7 @@
 Planification agile avec structure Epic/Feature/User Story, optimisée pour le développement solo assisté par Claude.
 
 ```bash
-/plugin install agile-planning@agile-skill
+/plugin install agile-planning@cyril-mp
 ```
 
 | Skill | Commande | Description |
@@ -32,7 +32,7 @@ Planification agile avec structure Epic/Feature/User Story, optimisée pour le d
 Interrogation NL->SQL de la base PostgreSQL Databox (ERP/CRM) en langage naturel francais.
 
 ```bash
-/plugin install databox-query@agile-skill
+/plugin install databox-query@cyril-mp
 ```
 
 | Composant | Commande | Description |
@@ -52,7 +52,7 @@ export DATABOX_DATABASE_URL="postgresql://user:password@host:5432/database"
 Developpement ThingWorx assiste pour le projet DataBox. Genere des services (ThingShapes XML), dashboards (GridStack) et tiles a partir des patterns existants.
 
 ```bash
-/plugin install twx-databox@agile-skill
+/plugin install twx-databox@cyril-mp
 ```
 
 ## License

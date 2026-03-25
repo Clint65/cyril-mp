@@ -11,8 +11,8 @@ Skill Claude Code pour interroger la base PostgreSQL **Databox** (ERP/CRM) en la
 ## Installation
 
 ```bash
-/plugin marketplace add Clint65/agile-skill
-/plugin install databox-query@agile-skill
+/plugin marketplace add Clint65/cyril-mp
+/plugin install databox-query@cyril-mp
 ```
 
 ## Configuration
