@@ -37,6 +37,23 @@ ls .planning/EXX-name/FXX-name/US-*/US-*-SUMMARY.md 2>/dev/null
 If dependencies not complete, warn user.
 </step>
 
+<step name="explore_codebase">
+Launch 2 `code-explorer` agents in parallel to understand existing code relevant to this story.
+Each agent targets a different angle (similar features, architecture/abstractions).
+
+After agents return, read the key files they identified.
+
+**Skip if:** no existing codebase, or story is purely structural (docs, config).
+</step>
+
+<step name="design_architecture">
+Launch 1 `code-architect` agent with exploration results to propose an implementation blueprint.
+
+Present the approach to the user and wait for confirmation before mapping tasks.
+
+**Skip for:** trivial stories (1 story point, single file change).
+</step>
+
 <step name="map_ac_to_tasks">
 For each acceptance criterion, create 1+ tasks.
 

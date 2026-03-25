@@ -152,9 +152,43 @@ How to verify:
 - **Rule 4:** Architectural change needed -> STOP, ask user
 - **Rule 5:** Enhancement idea -> log to ISSUES.md, continue
 
-**7. Verify acceptance criteria:**
+**7. Quality review (code-reviewer agent):**
 
-After all tasks complete:
+After all tasks are implemented, launch a `code-reviewer` agent to review the changes:
+
+> "Review the unstaged changes (`git diff`) for this user story implementation. Acceptance criteria to verify: [list ACs from plan]. Check for bugs, code quality, project conventions, and whether the implementation satisfies each AC. Only report issues with confidence >= 75."
+
+Present the review findings to the user:
+```
+════════════════════════════════════════
+CODE REVIEW: [story title]
+════════════════════════════════════════
+
+Verdict: [APPROVE | APPROVE WITH FIXES | REQUEST CHANGES]
+
+[Critical issues if any]
+[Important issues if any]
+
+AC alignment:
+- AC1: [PASS/FAIL]
+- AC2: [PASS/FAIL]
+
+What do you want to do?
+1. Fix issues now
+2. Fix later (proceed to commit)
+3. Skip review findings
+════════════════════════════════════════
+```
+
+If the user chooses to fix: apply the fixes, then re-run the reviewer if needed.
+
+Skip this step if:
+- The story is non-code (documentation, config only)
+- There are no unstaged changes (nothing to review)
+
+**8. Verify acceptance criteria:**
+
+After review (or after implementation if review was skipped):
 ```
 Acceptance Criteria Verification:
 
@@ -171,7 +205,7 @@ AC2: [criterion]
 
 If any FAIL: Report and ask how to proceed.
 
-**8. Create US-SUMMARY.md:**
+**9. Create US-SUMMARY.md:**
 
 Write to same directory as plan:
 ```markdown
@@ -205,12 +239,17 @@ Write to same directory as plan:
 
 [None | list deviations per rules]
 
+## Code Review
+
+[Review verdict: APPROVE / APPROVE WITH FIXES / Skipped]
+[Issues found and resolved, if any]
+
 ---
 *Story: US-XXX*
 *Completed: [date]*
 ```
 
-**9. Update tracking files:**
+**10. Update tracking files:**
 
 Update FEATURE.md - mark story complete:
 ```bash
@@ -220,7 +259,7 @@ cat $(dirname $(dirname $ARGUMENTS))/FEATURE.md
 
 Update counts in EPIC.md and ROADMAP.md if needed.
 
-**10. Report completion:**
+**11. Report completion:**
 ```
 ════════════════════════════════════════
 STORY IMPLEMENTED: US-XXX
@@ -258,6 +297,7 @@ Monitor context usage during execution:
 <success_criteria>
 - All tasks executed
 - All checkpoints passed
+- Code review completed via code-reviewer agent (unless non-code story)
 - All acceptance criteria verified
 - US-SUMMARY.md created
 - Tracking files updated

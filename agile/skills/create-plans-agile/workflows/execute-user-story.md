@@ -102,8 +102,18 @@ During execution, apply deviation rules automatically:
 - Document in summary: "Deferred: [enhancement] -> ISSUES.md"
 </step>
 
+<step name="quality_review">
+After all tasks complete, launch a `code-reviewer` agent to review the changes:
+
+The agent reviews `git diff` against acceptance criteria and project conventions.
+Present findings to user with verdict (APPROVE / APPROVE WITH FIXES / REQUEST CHANGES).
+User decides: fix now, fix later, or skip.
+
+**Skip if:** non-code story (documentation, config only) or no unstaged changes.
+</step>
+
 <step name="verify_acceptance_criteria">
-After all tasks complete, verify each acceptance criterion:
+After review (or after implementation if review was skipped), verify each acceptance criterion:
 
 ```
 Acceptance Criteria Verification:
