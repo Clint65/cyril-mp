@@ -30,7 +30,7 @@
       "name": "databox-query",
       "source": "./databox",
       "description": "Interrogation NL→SQL de la base PostgreSQL Databox (ERP/CRM) en langage naturel français.",
-      "version": "1.1.0",
+      "version": "1.2.0",
       "author": {
         "name": "Cyril Brandy"
       },
@@ -42,7 +42,17 @@
         "natural-language",
         "postgresql"
       ],
-      "license": "MIT"
+      "license": "MIT",
+      "mcpServers": {
+        "databox-postgres": {
+          "command": "npx",
+          "args": [
+            "-y",
+            "@modelcontextprotocol/server-postgres",
+            "${DATABOX_DATABASE_URL}"
+          ]
+        }
+      }
     },
     {
       "name": "twx-databox",
