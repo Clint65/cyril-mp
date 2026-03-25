@@ -125,8 +125,6 @@ Acceptance Criteria:
 - [x] AC3: [brief description]
 
 [BREAKING CHANGE: <description> — only if applicable]
-
-Co-Authored-By: Claude <noreply@anthropic.com>
 EOF
 )"
 ```
