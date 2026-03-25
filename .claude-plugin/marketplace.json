@@ -23,7 +23,8 @@
         "user-stories",
         "epics",
         "project-management"
-      ]
+      ],
+      "license": "MIT"
     },
     {
       "name": "databox-query",
@@ -40,7 +41,8 @@
         "crm",
         "natural-language",
         "postgresql"
-      ]
+      ],
+      "license": "MIT"
     },
     {
       "name": "twx-databox",
@@ -61,7 +63,8 @@
         "iiot",
         "xml",
         "thingshape"
-      ]
+      ],
+      "license": "MIT"
     }
   ]
 }
