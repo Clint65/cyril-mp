@@ -10,6 +10,7 @@ allowed-tools:
   - Glob
   - Grep
   - Agent
+  - AskUserQuestion
   - mcp__context7__*
   - mcp__exa__*
 ---

@@ -175,47 +175,19 @@ If yes: `git init`
 </context_scan>
 
 <domain_expertise>
-**Domain expertise** can optionally live in `~/.claude/skills/expertise/` if the user has configured domain-specific skills.
+If the user has domain-specific expertise skills in `~/.claude/skills/expertise/`, they can be loaded to enrich planning with domain knowledge.
 
-Before creating roadmap or user stories, check if domain expertise is available.
-
-<scan_domains>
 ```bash
 ls ~/.claude/skills/expertise/ 2>/dev/null || echo "NO_DOMAIN_EXPERTISE"
 ```
-If `NO_DOMAIN_EXPERTISE`: Skip domain loading entirely and continue with planning.
-</scan_domains>
 
-<inference_rules>
-If domain expertise directory exists and user's request contains domain keywords, INFER the domain:
-
-| Keywords | Domain Skill |
-|----------|--------------|
-| "macOS", "Mac app", "menu bar", "AppKit", "SwiftUI desktop" | expertise/macos-apps |
-| "iPhone", "iOS", "iPad", "mobile app", "SwiftUI mobile" | expertise/iphone-apps |
-| "Unity", "game", "C#", "3D game", "2D game" | expertise/unity-games |
-
-If domain inferred, confirm:
+If expertise found and relevant to the project, confirm with user before loading:
 ```
-Detected: [domain] project -> expertise/[skill-name]
-Load this expertise for planning? (Y / see other options / none)
-```
-</inference_rules>
-
-<load_domain>
-When domain selected, use intelligent loading:
-
-**Step 1: Read domain SKILL.md**
-```bash
-cat ~/.claude/skills/expertise/[domain]/SKILL.md 2>/dev/null
+Found domain expertise: [list]. Load for planning? (Y / none)
 ```
 
-This loads core principles and routing guidance (~5k tokens).
-
-**Step 2: Load only relevant references based on current work**
-
-Announce: "Loaded [domain] expertise."
-</load_domain>
+If loaded, read the domain SKILL.md and use its principles during roadmap and story creation.
+If no expertise directory exists, skip entirely.
 </domain_expertise>
 
 <intake>

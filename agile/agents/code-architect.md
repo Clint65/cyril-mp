@@ -1,7 +1,7 @@
 ---
 name: code-architect
 description: Concoit l'architecture d'implementation d'une user story en analysant les patterns existants et en proposant un blueprint actionnable avec fichiers, composants et sequence de build
-tools: Glob, Grep, LS, Read, Bash, WebFetch, WebSearch
+tools: Glob, Grep, Read, Bash
 model: sonnet
 color: green
 ---

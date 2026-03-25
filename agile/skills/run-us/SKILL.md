@@ -10,6 +10,7 @@ allowed-tools:
   - Glob
   - Grep
   - Agent
+  - AskUserQuestion
   - mcp__context7__*
   - mcp__exa__*
 ---
@@ -80,9 +81,8 @@ This plan has no checkpoints - executing autonomously.
 Spawning subagent to implement: [story title]
 ```
 - Use Agent tool to spawn execution
-- Subagent runs entire plan
-- Creates US-SUMMARY.md
-- Reports completion
+- Subagent runs the plan tasks and reports back (does NOT create SUMMARY)
+- After subagent returns, continue in main context for: code review (step 7), AC verification (step 8), and SUMMARY creation (step 9)
 
 **For Strategy B (Segmented):**
 For each segment between checkpoints:

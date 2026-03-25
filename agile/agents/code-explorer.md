@@ -1,7 +1,7 @@
 ---
 name: code-explorer
 description: Analyse le codebase existant pour comprendre les patterns, tracer les flux d'execution et identifier les fichiers cles avant de planifier une user story
-tools: Glob, Grep, LS, Read, Bash, WebFetch, WebSearch
+tools: Glob, Grep, Read, Bash
 model: sonnet
 color: yellow
 ---

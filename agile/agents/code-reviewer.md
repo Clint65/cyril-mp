@@ -1,7 +1,7 @@
 ---
 name: code-reviewer
 description: Review le code implemente pour une user story - bugs, qualite, conventions, securite - avec scoring de confiance pour ne remonter que les vrais problemes
-tools: Glob, Grep, LS, Read, Bash
+tools: Glob, Grep, Read, Bash
 model: sonnet
 color: red
 ---
