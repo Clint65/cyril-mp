@@ -175,10 +175,19 @@ If yes: `git init`
 </context_scan>
 
 <domain_expertise>
-If the user has domain-specific expertise skills in `~/.claude/skills/expertise/`, they can be loaded to enrich planning with domain knowledge.
+Sibling plugins in the same marketplace may ship domain expertise files that enrich planning.
+Convention: each plugin stores its agile expertise in `<plugin>/expertise/agile-planning.md`.
+
+Scan for expertise files relative to the marketplace root (three levels up from this SKILL.md):
 
 ```bash
-ls ~/.claude/skills/expertise/ 2>/dev/null || echo "NO_DOMAIN_EXPERTISE"
+# From the marketplace root, find all agile-planning expertise files
+find "$(dirname "$(dirname "$(dirname "$(readlink -f "${SKILL_PATH:-$0}")")")")" -path "*/expertise/agile-planning.md" -type f 2>/dev/null || echo "NO_DOMAIN_EXPERTISE"
+```
+
+If that fails or returns nothing, try the known marketplace path as fallback:
+```bash
+ls ~/Documents/01_Sources/02_IA/mes-skills/*/expertise/agile-planning.md 2>/dev/null || echo "NO_DOMAIN_EXPERTISE"
 ```
 
 If expertise found and relevant to the project, confirm with user before loading:
@@ -186,8 +195,8 @@ If expertise found and relevant to the project, confirm with user before loading
 Found domain expertise: [list]. Load for planning? (Y / none)
 ```
 
-If loaded, read the domain SKILL.md and use its principles during roadmap and story creation.
-If no expertise directory exists, skip entirely.
+If loaded, read each expertise file and use its principles during roadmap and story creation (estimation adjustments, acceptance criteria patterns, story splitting guidance, architecture constraints).
+If no expertise files found, skip entirely.
 </domain_expertise>
 
 <intake>
